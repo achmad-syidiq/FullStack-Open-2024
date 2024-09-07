@@ -7,6 +7,9 @@ const App = () => {
   const [good, setGood] = useState(0)
   const [neutral, setNeutral] = useState(0)
   const [bad, setBad] = useState(0)
+  const all = good + neutral + bad
+  const average = all ? (good - bad) / all : 0
+  const positive = good ? good / all * 100 : 0
   const increaseGood = () => {
     const updatedGood = good + 1
     setGood(updatedGood)
@@ -18,7 +21,7 @@ const App = () => {
   const increaseBad = () => {
     const updatedBad = bad + 1
     setBad(updatedBad)
-  };
+  }; 
   return (
     <div>
       <Display text="give feedback"/>
@@ -29,6 +32,9 @@ const App = () => {
       <StatisticLine text="good" value={good} />
       <StatisticLine text="neutral" value={neutral} />
       <StatisticLine text="bad" value={bad} />
+      <StatisticLine text="all" value={all} />
+      <StatisticLine text="average" value={average} />
+      <StatisticLine text="positive" value={`${positive} %`} />
     </div>
   )
 }
