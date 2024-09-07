@@ -5,8 +5,14 @@ const Button = ({onSmash, text}) => <button onClick={onSmash}>{text}</button>
 const StatisticLine = ({text, value}) => <div>{text} {value}</div>
 const Statistic = ({good, neutral, bad}) => {
   const all = good + neutral + bad
-  const average = all ? (good - bad) / all : 0
+  const average = (good - bad) / all
   const positive = good ? good / all * 100 : 0
+  if (!all) return (
+    <div>
+      <Display text="statistics"/>
+      <p>No feedback given</p>
+    </div>
+  )
   return (
     <div>
       <Display text="statistics"/>
