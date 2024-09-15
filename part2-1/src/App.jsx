@@ -21,8 +21,12 @@ const App = () => {
       important: Math.random() < 0.5,
       id: String(notes.length + 1),
     }
-    setNotes(notes.concat(noteObject))
-    setNewNotes('')
+    axios 
+      .post('http://localhost:3001/notes', noteObject)
+      .then(response => {
+        setNotes(notes.concat(response.data))
+        setNewNotes('')
+      })
   }
 
   const handleNoteChange = (event) => {
