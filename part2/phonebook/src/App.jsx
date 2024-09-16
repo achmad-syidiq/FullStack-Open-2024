@@ -32,16 +32,21 @@ const App = () => {
       alert(`${newPerson} has already added in phonebook`);
       return;
     }
-    setPersons([
-      ...persons,
-      {
-        name: newPerson,
-        number: newNumber,
-        id: persons.length + 1,
-      },
-    ]);
-    setNewPerson("");
-    setNewNumber("");
+
+    const newObjectPerson = {
+      name: newPerson,
+      number: newNumber,
+      id: String(persons.length + 1),
+    }
+
+    axios
+      .post('http://localhost:3001/persons', newObjectPerson)
+      .then( response => {
+        setPersons([...persons, response.data])
+        setNewPerson("");
+        setNewNumber("");
+      })
+    
   };
 
   return (
