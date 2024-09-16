@@ -1,5 +1,10 @@
 import { useEffect, useState } from "react";
+import Display from "./components/Display";
+import Filter from "./components/FilterPerson";
+import Person from "./components/Person"
+import PersonForm from "./components/PersonForm"
 import axios from "axios";
+import phoneServices from "./services/phones"
 
 const App = () => {
   const [persons, setPersons] = useState([]);
@@ -9,9 +14,9 @@ const App = () => {
   const filteredPerson = persons.filter((person) => person.name.toLowerCase().includes(searchTerm.toLowerCase()));
   
   useEffect(()=> {
-    axios
-      .get("http://localhost:3001/persons")
-      .then(response => setPersons(response.data))
+    phoneServices
+      .getAll()
+      .then(initialPhones => setPersons(initialPhones))
   }, [])
 
   const handleSearchTerm = (event) => {
@@ -39,10 +44,10 @@ const App = () => {
       id: String(persons.length + 1),
     }
 
-    axios
-      .post('http://localhost:3001/persons', newObjectPerson)
-      .then( response => {
-        setPersons([...persons, response.data])
+    phoneServices
+      .create(newObjectPerson)
+      .then( returnedPersons => {
+        setPersons([...persons, returnedPersons])
         setNewPerson("");
         setNewNumber("");
       })
@@ -51,9 +56,9 @@ const App = () => {
 
   return (
     <div>
-      <h2>Phonebook</h2>
+      <Display text="Phonebook" />
       <Filter value={searchTerm} handle={handleSearchTerm} />
-      <h2>add a new</h2>
+      <Display text="add a new" />
       <PersonForm 
         onAction={handleAddPerson} 
         person={newPerson}
@@ -61,47 +66,11 @@ const App = () => {
         number={newNumber} 
         handleNumber={handleNewNumber} 
       />
-      <h2>Numbers</h2>
+      <Display text="Numbers" />
       <Person value={filteredPerson} />
     </div>
   );
 };
 
-const Filter = ({ value, handle }) => {
-  return (
-    <div>
-      filter shown with <input value={value} onChange={handle} />
-    </div>
-  );
-};
-
-const PersonForm = (props) => {
-  const {onAction, person, handlePerson, number, handleNumber} = props
-  return (
-    <form onSubmit={onAction}>
-      <div>
-        Name: <input value={person} onChange={handlePerson} />
-      </div>
-      <div>
-        Number: <input value={number} onChange={handleNumber} />
-      </div>
-      <div>
-        <button type="submit">Add</button>
-      </div>
-    </form>
-  );
-};
-
-const Person = ({ value }) => {
-  return (
-    <>
-      {value.map((person) => (
-        <p key={person.id}>
-          {person.name} {person.number}
-        </p>
-      ))}
-    </>
-  );
-};
 
 export default App;
