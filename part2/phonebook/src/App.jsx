@@ -15,7 +15,7 @@ const App = () => {
   
   useEffect(()=> {
     phoneServices
-      .getAll()
+      .getAllPerson()
       .then(initialPhones => setPersons(initialPhones))
   }, [])
 
@@ -45,7 +45,7 @@ const App = () => {
     }
 
     phoneServices
-      .create(newObjectPerson)
+      .createPerson(newObjectPerson)
       .then( returnedPersons => {
         setPersons([...persons, returnedPersons])
         setNewPerson("");
@@ -53,6 +53,16 @@ const App = () => {
       })
     
   };
+
+  const handleDeletedPerson = (id, name) => {
+    if (window.confirm(`Do you really want to delete ${name}?`)){
+      phoneServices
+        .deletePerson(id)
+        .then(() => 
+          setPersons(persons.filter(person => person.id !== id))
+      )
+    }
+  }
 
   return (
     <div>
@@ -67,7 +77,7 @@ const App = () => {
         handleNumber={handleNewNumber} 
       />
       <Display text="Numbers" />
-      <Person value={filteredPerson} />
+      <Person persons={filteredPerson} toggle={handleDeletedPerson} />
     </div>
   );
 };

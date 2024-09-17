@@ -1,11 +1,12 @@
 import React from "react";
 
-const Person = ({ value }) => {
+const Person = ({ persons, toggle }) => {
   return (
     <>
-      {value.map((person) => (
+      {persons.map((person) => (
         <p key={person.id}>
           {person.name} {person.number}
+          <button onClick={() => toggle(person.id, person.name)}>delete</button>
         </p>
       ))}
     </>
