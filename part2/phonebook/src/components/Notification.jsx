@@ -2,8 +2,10 @@ import React from 'react'
 
 const Notification = ({message}) => {
   if (message === null) { return null }
+  console.log('message', message)
+  console.log('message.type', message.type)
   return (
-    <div className='notification'>{message}</div>
+    <div className={message.type}>{message.text}</div>
   )
 }
 

@@ -1,4 +1,5 @@
 import axios from "axios";
+import Notification from "../components/Notification";
 
 const baseUrl = "http://localhost:3001/persons";
 
@@ -11,7 +12,7 @@ const createPerson = (newObject) => {
 };
 
 const deletePerson = (id) => {
-  return axios.delete(`${baseUrl}/${id}`);
+  return axios.delete(`${baseUrl}/${id}`)
 };
 
 const updatePerson = (id, updatedObject) => {

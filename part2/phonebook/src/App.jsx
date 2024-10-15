@@ -6,7 +6,6 @@ import PersonForm from "./components/PersonForm";
 import Notification from "./components/Notification";
 import phoneServices from "./services/phones";
 
-
 const App = () => {
   const [persons, setPersons] = useState([]);
   const [newPerson, setNewPerson] = useState("");
@@ -38,18 +37,22 @@ const App = () => {
       const confirmUpdate = window.confirm(`${newPerson} is already added to phonebook, replace the old number with a new one?`);
       if (confirmUpdate) {
         const updatedPerson = { ...existingPerson, number: newNumber };
-        phoneServices.updatePerson(existingPerson.id, updatedPerson)
-        .then((returnedPerson) => {
-          setPersons(persons.map((person) => (person.id !== existingPerson.id ? person : returnedPerson)));
-          setNewPerson("");
-          setNewNumber("");
-        })
-        .then(() => {
-          setMessage(`Updated ${existingPerson.name}'s number`);
-          setTimeout(() => {
-            setMessage(null);
-          }, 5000);
-        });
+        phoneServices
+          .updatePerson(existingPerson.id, updatedPerson)
+          .then((returnedPerson) => {
+            setPersons(persons.map((person) => (person.id !== existingPerson.id ? person : returnedPerson)));
+            setNewPerson("");
+            setNewNumber("");
+          })
+          .then(() => {
+            setMessage({
+              text: `Updated ${existingPerson.name}'s number`,
+              type: "success",
+            });
+            setTimeout(() => {
+              setMessage(null);
+            }, 5000);
+          });
       } else {
         setNewPerson("");
         setNewNumber("");
@@ -60,24 +63,52 @@ const App = () => {
         number: newNumber,
         id: String(persons.length + 1),
       };
-      phoneServices.createPerson(newObjectPerson)
-      .then((returnedPerson) => {
-        setPersons([...persons, returnedPerson]);
-        setNewNumber("");
-        setNewPerson("");
-      })
-      .then(() => {
-        setMessage(`Added ${newObjectPerson.name}`);
-        setTimeout(() => {
-          setMessage(null);
-        }, 5000);
-      })
+      phoneServices
+        .createPerson(newObjectPerson)
+        .then((returnedPerson) => {
+          setPersons([...persons, returnedPerson]);
+          setNewNumber("");
+          setNewPerson("");
+        })
+        .then(() => {
+          setMessage({
+            text: `Added ${newObjectPerson.name}`,
+            type: "success",
+          });
+          setTimeout(() => {
+            setMessage(null);
+          }, 5000);
+        });
     }
   };
 
   const handleDeletedPerson = (id, name) => {
     if (window.confirm(`Do you really want to delete ${name}?`)) {
-      phoneServices.deletePerson(id).then(() => setPersons(persons.filter((person) => person.id !== id)));
+      phoneServices
+        .deletePerson(id, name)
+        .then(() => {
+          setPersons(persons.filter((person) => person.id !== id));
+          setMessage(
+            {
+              text: `Deleted ${name} from server`,
+              type: "success",
+            },
+            setTimeout(() => {
+              setMessage(null);
+            }, 5000)
+          );
+        })
+        .catch((err) => {
+          if (err.response && err.response.status === 404) {
+            console.log("error bro", err.response.status);
+            setMessage({
+              text: `Information of ${name} has already been removed from server`,
+              type: "error",
+            });
+            setPersons(persons.filter((person) => person.id !== id));
+            setTimeout(() => setMessage(null), 5000);
+          }
+        });
     }
   };
 
