@@ -3,13 +3,16 @@ import Display from "./components/Display";
 import Filter from "./components/FilterPerson";
 import Person from "./components/Person";
 import PersonForm from "./components/PersonForm";
+import Notification from "./components/Notification";
 import phoneServices from "./services/phones";
+
 
 const App = () => {
   const [persons, setPersons] = useState([]);
   const [newPerson, setNewPerson] = useState("");
   const [newNumber, setNewNumber] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
+  const [message, setMessage] = useState(null);
   const filteredPerson = persons.filter((person) => person.name.toLowerCase().includes(searchTerm.toLowerCase()));
 
   useEffect(() => {
@@ -33,13 +36,19 @@ const App = () => {
     const existingPerson = persons.find((person) => person.name === newPerson);
     if (existingPerson) {
       const confirmUpdate = window.confirm(`${newPerson} is already added to phonebook, replace the old number with a new one?`);
-      console.log('conrifUpdate', confirmUpdate)
       if (confirmUpdate) {
         const updatedPerson = { ...existingPerson, number: newNumber };
-        phoneServices.updatePerson(existingPerson.id, updatedPerson).then((returnedPerson) => {
+        phoneServices.updatePerson(existingPerson.id, updatedPerson)
+        .then((returnedPerson) => {
           setPersons(persons.map((person) => (person.id !== existingPerson.id ? person : returnedPerson)));
           setNewPerson("");
           setNewNumber("");
+        })
+        .then(() => {
+          setMessage(`Updated ${existingPerson.name}'s number`);
+          setTimeout(() => {
+            setMessage(null);
+          }, 5000);
         });
       } else {
         setNewPerson("");
@@ -51,11 +60,18 @@ const App = () => {
         number: newNumber,
         id: String(persons.length + 1),
       };
-      phoneServices.createPerson(newObjectPerson).then((returnedPerson) => {
+      phoneServices.createPerson(newObjectPerson)
+      .then((returnedPerson) => {
         setPersons([...persons, returnedPerson]);
         setNewNumber("");
         setNewPerson("");
-      });
+      })
+      .then(() => {
+        setMessage(`Added ${newObjectPerson.name}`);
+        setTimeout(() => {
+          setMessage(null);
+        }, 5000);
+      })
     }
   };
 
@@ -68,6 +84,7 @@ const App = () => {
   return (
     <div>
       <Display text="Phonebook" />
+      <Notification message={message} />
       <Filter value={searchTerm} handle={handleSearchTerm} />
       <Display text="add a new" />
       <PersonForm onAction={handleAddPerson} person={newPerson} handlePerson={handleNewPerson} number={newNumber} handleNumber={handleNewNumber} />
